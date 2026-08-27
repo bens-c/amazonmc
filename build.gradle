@@ -1,24 +1,25 @@
-plugins {
-    id 'fabric-loom' version '1.14.10'
+plugins { id 'java' }
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://repo.papermc.io/repository/maven-public/' }
 }
 
-repositories { mavenCentral() }
-loom { accessWidenerPath = file('src/main/resources/amazonmc.accesswidener') }
-
 dependencies {
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings loom.officialMojangMappings()
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-    testImplementation platform('org.junit:junit-bom:5.11.4')
+    compileOnly 'io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT'
+    compileOnly 'com.google.code.gson:gson:2.11.0'
+    testImplementation 'io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT'
+    testImplementation 'com.google.code.gson:gson:2.11.0'
+    testImplementation 'org.mockbukkit.mockbukkit:mockbukkit-v1.21:4.100.0'
+    testImplementation platform('org.junit:junit-bom:6.0.2')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-base { archivesName = 'amazonmc-fabric-1.21.11' }
+base { archivesName = 'amazonmc-paper-1.21.11' }
 processResources {
     inputs.property 'version', project.version
-    filesMatching('fabric.mod.json') { expand version: project.version }
+    filesMatching('plugin.yml') { expand version: project.version }
 }
 tasks.withType(JavaCompile).configureEach {
     options.release = 21

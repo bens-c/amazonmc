@@ -20,13 +20,13 @@ class LedgerTest {
     private final TestClock clock = new TestClock();
     private Ledger ledger() throws IOException { return new Ledger(directory, clock); }
 
-    @Test void initialBalanceIsWorldLocalAndPersistent() throws IOException {
+    @Test void initialBalanceIsStorageLocalAndPersistent() throws IOException {
         assertEquals(250, ledger().snapshot(player).coins());
         Ledger ledger = ledger();
         ledger.credit(player, 37);
         assertEquals(287, ledger().snapshot(player).coins());
         assertEquals(250, ledger().snapshot(UUID.randomUUID()).coins());
-        assertEquals(250, new Ledger(directory.resolve("another-world"), clock).snapshot(player).coins());
+        assertEquals(250, new Ledger(directory.resolve("another-server"), clock).snapshot(player).coins());
     }
 
     @Test void purchaseDebitsAndDeliversOnlyAfterDelay() throws IOException {

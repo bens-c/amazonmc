@@ -1,0 +1,17 @@
+name: AmazonMC
+version: '${version}'
+main: de.amazonmc.AmazonPlugin
+api-version: '1.21.11'
+description: Ingame shop with coins and parcel deliveries. No real purchases.
+author: AmazonMC Project
+website: https://github.com/bens-c/amazonmc
+commands:
+  amazon:
+    description: Opens the AmazonMC shop
+    aliases: [amz]
+    usage: /amazon [shop|pakete|geld|bonus|verkaufen [anzahl]|hilfe]
+    permission: amazonmc.use
+permissions:
+  amazonmc.use:
+    description: Use the shop, coin account and parcel inbox
+    default: true

@@ -1,36 +1,36 @@
 package de.amazonmc;
 
-import net.minecraft.world.Container;
-import net.minecraft.world.item.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.ItemStack;
 import java.io.IOException;
 
-/** Plans the complete transfer before touching either the account or the inventory. */
+/** Plans the full transfer using storage slots only (no armor or offhand). */
 final class InventoryDelivery {
     @FunctionalInterface interface Commit { void run() throws IOException; }
-
-    static void deliver(Container inventory, ItemStack sample, int count, Commit commit) throws IOException {
-        if (sample.isEmpty() || count < 1 || inventory.getContainerSize() < 36) throw new IllegalArgumentException("Ungültiges Paket.");
-        ItemStack[] plan = new ItemStack[36];
-        for (int i = 0; i < plan.length; i++) plan[i] = inventory.getItem(i).copy();
+    static void deliver(PlayerInventory inventory, ItemStack sample, int count, Commit commit) throws IOException {
+        if (sample.getType().isAir() || count < 1) throw new IllegalArgumentException("Ungültiges Paket.");
+        ItemStack[] plan = inventory.getStorageContents();
+        for (int i = 0; i < plan.length; i++) if (plan[i] != null) plan[i] = plan[i].clone();
         int remaining = count;
+        int limit = Math.min(sample.getMaxStackSize(), inventory.getMaxStackSize());
         for (ItemStack slot : plan) {
-            if (!slot.isEmpty() && ItemStack.isSameItemSameComponents(slot, sample)) {
-                int n = Math.min(remaining, Math.max(0, Math.min(sample.getMaxStackSize(), inventory.getMaxStackSize()) - slot.getCount()));
-                slot.grow(n);
+            if (slot != null && !slot.getType().isAir() && slot.isSimilar(sample)) {
+                int n = Math.min(remaining, Math.max(0, limit - slot.getAmount()));
+                slot.setAmount(slot.getAmount() + n);
                 remaining -= n;
             }
         }
         for (int i = 0; i < plan.length && remaining > 0; i++) {
-            if (plan[i].isEmpty()) {
-                int n = Math.min(remaining, Math.min(sample.getMaxStackSize(), inventory.getMaxStackSize()));
-                plan[i] = sample.copyWithCount(n);
+            if (plan[i] == null || plan[i].getType().isAir()) {
+                int n = Math.min(remaining, limit);
+                plan[i] = sample.clone();
+                plan[i].setAmount(n);
                 remaining -= n;
             }
         }
         if (remaining > 0) throw new IllegalArgumentException("Nicht genug Platz! Mach Platz für " + count + " Items. Das Paket bleibt im Fach.");
         commit.run();
-        for (int i = 0; i < plan.length; i++) inventory.setItem(i, plan[i]);
-        inventory.setChanged();
+        inventory.setStorageContents(plan);
     }
     private InventoryDelivery() { }
 }

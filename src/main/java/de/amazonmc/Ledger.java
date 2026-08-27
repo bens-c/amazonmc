@@ -11,7 +11,7 @@ import java.time.Clock;
 import java.util.*;
 import java.util.function.Function;
 
-/** World-local economy. Called only on the server thread. Persist before committing in memory. */
+/** Server-local economy. Called only on the server thread. Persist before committing in memory. */
 public final class Ledger {
     public static final int START_COINS = 250;
     public static final int DAILY_COINS = 100;
